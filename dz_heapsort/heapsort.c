@@ -56,7 +56,7 @@ int heapAtomDesc(char* atomTopHeapPtr, int i, int n){
 
 int exitHeapSort(char* topHeapPtr){
         free((void*)topHeapPtr);
-        printf("Heap pointer killed\n\n\r");
+        printf("Heap killed\n\n\r");
         return 1;
 }
 
