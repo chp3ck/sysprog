@@ -1,26 +1,36 @@
-#include "stdio.h"
-#include "stdlib.h"
-#include <string.h>
 #include <unistd.h>
-#include <wait.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-int main( ) {
-	int pipes[2];
-	char buff[128];
-	if(pipe(pipes) == 0){
-		if(fork() == 0){
-			close(pipes[0]);
-			char* msg_1 = "child sends first message...\n\r";
-			write(pipes[1], msg_1, strlen(msg_1) + 1);
-			char* msg_2 = {"child sends second message...\n\r"};
-			write(pipes[1], msg_2, strlen(msg_2) + 1);
-		}
+#define BYTES_NUMBER 128
+
+int dataInput(char* dataPtr){
+        printf("Input data:\n\r>>");
+        scanf(" %127[^\n]s", dataPtr);
+        return 0;
+}
+
+int main() {
+	char* dataParentPtr=malloc(BYTES_NUMBER*sizeof(char));
+	dataInput(dataParentPtr);
+	char* dataBufPtr=malloc(BYTES_NUMBER*sizeof(char));
+	int  p1[2], p2[2];
+	pipe(p1);
+	pipe(p2);
+	if(fork() == 0){
+		close(p1[1]);
+		close(p2[0]);
+		read(p1[0], dataBufPtr, BYTES_NUMBER*sizeof(dataBufPtr));
+		write(p2[1], dataBufPtr, BYTES_NUMBER*sizeof(dataBufPtr));
+		exit(0);
 	}else{
-		close(pipes[1]);
-		read(pipes[0], buff, 128);
-		printf("Parent receives message: %s", buff);
-		read(pipes[0], buff, 128);
-		printf("Parent receives 2nd message : %s", buff);
-		wait(NULL);
+		close(p1[0]);
+		close(p2[1]);
+		printf("Parent write to first pipe ---> %s\n\r", dataParentPtr);
+		write(p1[1], dataParentPtr, BYTES_NUMBER*sizeof(dataParentPtr));
+		read(p2[0], dataBufPtr, BYTES_NUMBER*sizeof(dataBufPtr));
+		printf("Parent read from second pipe: <--- %s\n\r", dataBufPtr);
 	}
+	return 0;
 }
