@@ -189,9 +189,7 @@ int main(void){
 	printf("Parent starts fork...\n\r");
 	if ((sigPid=fork())==0){
 	    printf("Child was forked...\n\r");
-	    if ((int)sigPid == 0){
-	    	sigCatcher();
-	    }
+	    sigCatcher();
 	    while(1);
         }else{
 	    printf("Parent wait 1s for fun...\n\r");
