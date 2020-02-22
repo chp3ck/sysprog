@@ -1,0 +1,8 @@
+#!/bin/bash
+
+./socket_server &
+DEMID_SOCK_SERV_PID=$(ps -aux | grep socket_server | awk '{ print $2 }' | head -c 4)
+echo socket_server PID: $DEMID_SOCK_SERV_PID
+sleep 7s && echo "SERVER MUST DIE" && kill $DEMID_SOCK_SERV_PID &
+./socket_client 127.0.0.1
+
