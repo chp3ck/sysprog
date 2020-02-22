@@ -70,7 +70,7 @@ int heapPrint(char* topHeapPtr){
         if (strlen(topHeapPtr) == 0){
                 printf("Array is empty!!!\n\r");
         }else{
-		printf("Array: %s\n\r", topHeapPtr);
+		printf("Array: --->%s<---\n\r", topHeapPtr);
 	}
 	return 0;
 }
@@ -88,7 +88,9 @@ int heapAsc(char* topHeapPtr){
 			heapSwap(&(topHeapPtr[0]), &(topHeapPtr[i]));
 			heapAtomAsc(topHeapPtr, 0, i);
 		}
-        }
+		printf("Succesfully sorted ascending...\n\r");
+		heapPrint(topHeapPtr);
+	}
 	return 0;
 }
 
@@ -105,6 +107,8 @@ int heapDesc(char* topHeapPtr){
                         heapSwap(&(topHeapPtr[0]), &(topHeapPtr[i]));
                         heapAtomDesc(topHeapPtr, 0, i);
                 }
+		printf("Succesfully sorted descending...\n\r");
+		heapPrint(topHeapPtr);
         }
 	return 0;
 }
