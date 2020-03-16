@@ -14,8 +14,6 @@
 
 #include "dz_chrdev.h"
 
-#define BUF_LEN_MSG 128
-
 MODULE_AUTHOR("Chpeckdev");
 MODULE_LICENSE("GPL");
 
@@ -33,7 +31,7 @@ static int dev_major;
 static struct class* class_chpeckdev;
 static int Device_Open = 0;
 
-static char msg[BUF_LEN_MSG];
+static char msg[CHRDEV_BUF_LEN_MSG];
 static char *msg_Ptr;
 
 static struct file_operations fo = {
@@ -100,12 +98,12 @@ static ssize_t device_write(struct file *filp, const char *buff, size_t len, lof
 
 	int i = 0;
 
-	if (len > BUF_LEN_MSG){
+	if (len > CHRDEV_BUF_LEN_MSG){
 		return -EINVAL;
 	}
-	memset(msg, 0, BUF_LEN_MSG);
+	memset(msg, 0, CHRDEV_BUF_LEN_MSG);
 	msg_Ptr = msg;
-	for (i = 0; i < len && i < BUF_LEN_MSG; i++){
+	for (i = 0; i < len && i < CHRDEV_BUF_LEN_MSG; i++){
 		get_user(msg[i], buff + i);
 	}
 	return i;
@@ -119,13 +117,13 @@ long chpeck_ioctl_chrdev(struct file *file, unsigned int ioctl_num, unsigned lon
 		case IOCTL_SET_MSG:
 			temp = (char *)ioctl_param;
 			get_user(ch, temp);
-			for (i = 0; ch && i < BUF_LEN_MSG; i++, temp++){
+			for (i = 0; ch && i < CHRDEV_BUF_LEN_MSG; i++, temp++){
 				get_user(ch, temp);
 			}
 			device_write(file, (char*)ioctl_param, i, 0);
 			break;
 		case IOCTL_GET_MSG:
-			i = device_read(file, (char*)ioctl_param, BUF_LEN_MSG, 0);
+			i = device_read(file, (char*)ioctl_param, CHRDEV_BUF_LEN_MSG, 0);
 			put_user('\0', (char*)ioctl_param + i);
 			break;
 	}
