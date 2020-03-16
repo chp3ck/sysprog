@@ -33,9 +33,6 @@ static int dev_major;
 static struct class* class_chpeckdev;
 static int Device_Open = 0;
 
-static char ioctl_buffer[IOCTL_MAX_SIZE];
-static unsigned long ioctl_buffer_size = 0;
-
 static char msg[BUF_LEN_MSG];
 static char *msg_Ptr;
 
@@ -107,6 +104,7 @@ static ssize_t device_write(struct file *filp, const char *buff, size_t len, lof
 		return -EINVAL;
 	}
 	memset(msg, 0, BUF_LEN_MSG);
+	msg_Ptr = msg;
 	for (i = 0; i < len && i < BUF_LEN_MSG; i++){
 		get_user(msg[i], buff + i);
 	}
