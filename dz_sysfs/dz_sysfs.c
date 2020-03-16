@@ -5,8 +5,8 @@
 #include <linux/fs.h>
 #include <linux/string.h>
 
-MODULE_AUTHOR("Chpeckdev");
 MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Chpeckdev");
 
 static struct kobject *chpeck_module;
 
