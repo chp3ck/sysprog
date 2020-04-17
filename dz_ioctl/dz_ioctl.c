@@ -4,6 +4,7 @@
 #include <sys/ioctl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 int ioctl_set_msg(int loc_fd, char *loc_msg_ptr){
 
@@ -33,7 +34,7 @@ int ioctl_get_msg(int loc_fd){
 int menu_input(int* loc_cur_ptr){
 
 	printf("Please enter:\n\r1 -> ioctl write\n\r2 ->  ioctl read\n\r3 -> exit\n\r");
-	scanf("%1d", loc_cur_ptr);
+	scanf("%31d", loc_cur_ptr);
 	return 0;
 }
 
@@ -66,8 +67,18 @@ int main(){
 			case 3:
 				in_menu = 0;
 				break;
+			case 69:
+				printf("LOL BECH U REALLY WANNA C SAM KEKES CODES???????\n\r");
+				printf("ENTA CKRET 4 SAM KEKEKODES EUUUU:\n\r-> ");
+				scanf(" %127[^\n]s", msg_ptr);
+				if (strcmp(msg_ptr,"DEADBEEF") == 0){
+					printf("C UR KEKES BECH:\n\rIOCTL_SET_MSG: --> 0x%x\n\rIOCTL_GET_MSG: --> 0x%x\n\r", IOCTL_SET_MSG, IOCTL_GET_MSG);
+				} else {
+					printf("BBBAADDD CKRET BECH EUUUU: %s!!!!!!\n\r", msg_ptr);
+				}
+				break;
 			default:
-				printf("Check cur_ptr condition, u in default branch...\n\r");
+				printf("Wrong enter, u in default branch...\n\r");
 				break;
 		}
 	}
