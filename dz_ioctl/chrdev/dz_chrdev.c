@@ -44,21 +44,21 @@ static struct file_operations fo = {
 
 int init_module(void){
 
-	dev_major = register_chrdev(MAJOR_NUM, DEVICE_NAME, &fo);
+	dev_major = register_chrdev(0, DEVICE_NAME, &fo);
 	if (dev_major < 0){
 		printk("Dev failed %d\n\r", dev_major);
 		return dev_major;
   	}
 	class_chpeckdev = (struct class*)class_create(THIS_MODULE, DEVICE_NAME);
-	device_create(class_chpeckdev, NULL, MKDEV(MAJOR_NUM, 0), NULL, DEVICE_NAME);
+	device_create(class_chpeckdev, NULL, MKDEV(dev_major, 0), NULL, DEVICE_NAME);
 	return 0;
 }
 
 void cleanup_module(void){
 
-	device_destroy(class_chpeckdev, MKDEV(MAJOR_NUM, 0));
+	device_destroy(class_chpeckdev, MKDEV(dev_major, 0));
 	class_destroy(class_chpeckdev);
-	unregister_chrdev(MAJOR_NUM, DEVICE_NAME);
+	unregister_chrdev(dev_major, DEVICE_NAME);
 }
 
 static int device_open(struct inode *inode, struct file *file){
@@ -110,22 +110,26 @@ static ssize_t device_write(struct file *filp, const char *buff, size_t len, lof
 }
 
 long chpeck_ioctl_chrdev(struct file *file, unsigned int ioctl_num, unsigned long ioctl_param){
+	int ioctl_set_msg_hexnum = _IOW(dev_major, 0, char*);
+	int ioctl_get_msg_hexnum = _IOR(dev_major, 1, char*);
 	int i = 0;
-	char *temp;
+	char* tmp;
 	char ch;
-	switch (ioctl_num){
-		case IOCTL_SET_MSG:
-			temp = (char *)ioctl_param;
-			get_user(ch, temp);
-			for (i = 0; ch && i < CHRDEV_BUF_LEN_MSG; i++, temp++){
-				get_user(ch, temp);
-			}
-			device_write(file, (char*)ioctl_param, i, 0);
-			break;
-		case IOCTL_GET_MSG:
-			i = device_read(file, (char*)ioctl_param, CHRDEV_BUF_LEN_MSG, 0);
-			put_user('\0', (char*)ioctl_param + i);
-			break;
+	if (ioctl_num == ioctl_set_msg_hexnum){
+		tmp = (char *)ioctl_param;
+		get_user(ch, tmp);
+		for (i = 0; ch && i < CHRDEV_BUF_LEN_MSG; i++, tmp++){
+			get_user(ch, tmp);
+		}
+		device_write(file, (char*)ioctl_param, i, 0);
+	} else if (ioctl_num == ioctl_get_msg_hexnum){
+		i = device_read(file, (char*)ioctl_param, CHRDEV_BUF_LEN_MSG, 0);
+		put_user('\0', (char*)ioctl_param + i);
+	} else{
+		tmp = "HEU BABE ITS WRONG ioctl_num CHECK IT";
+		device_write(file, tmp, 37, 0);
+		i = device_read(file, (char*)ioctl_param, CHRDEV_BUF_LEN_MSG, 0);
+		put_user('\0', (char*)ioctl_param + i);
 	}
 	return 0;
 }
