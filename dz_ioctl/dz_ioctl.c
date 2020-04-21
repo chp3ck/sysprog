@@ -43,8 +43,12 @@ int ioctl_get_major_by_dev_name(char* dev_name, int* dev_major_ptr){
 
 	char* target_file = "/proc/devices";
 	char* file_mode = "r";
+	char* entry;
 	char* line;
 	char* line_tmp = (char*)malloc(128*sizeof(char));
+	int diff;
+	int major_num_size = 0;
+	int i;
 	FILE* fin;
 
 	printf("Start search major of device %s in %s...\n\r", dev_name, target_file);
@@ -52,12 +56,21 @@ int ioctl_get_major_by_dev_name(char* dev_name, int* dev_major_ptr){
 	fin = fopen(target_file, file_mode);
 	if (fin){
 		while (line = read_line(fin)){
-			if ( strstr(line, dev_name) ){
-				strncpy(line_tmp, line, 3);
-				*dev_major_ptr = atoi(line_tmp);
+			if ( entry = strstr(line, dev_name) ){
+				diff = entry - line;
+				major_num_size = diff - 1;
+				i = 0;
+				while (line[diff+i] == dev_name[i]){
+					if ((line[diff+i] == '\0') && (dev_name[i] == '\0')){
+						strncpy(line_tmp, line, major_num_size);
+						*dev_major_ptr = atoi(line_tmp);
+					}
+					i++;
+				}
 			}
 			free(line);
 		}
+		free(line_tmp);
 	} else{
 		printf("Unable to open /proc/devices...\n\r");
 		exit(-1);
